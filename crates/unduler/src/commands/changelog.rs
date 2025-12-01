@@ -11,7 +11,7 @@ use tracing::info;
 
 use unduler_bumper_semver::SemverBumper;
 use unduler_commit::{ParsedCommit, RawCommit};
-use unduler_config::{find_and_load_config, Config};
+use unduler_config::{Config, find_and_load_config};
 use unduler_formatter_keepachangelog::KeepAChangelogFormatter;
 use unduler_git::Repository;
 use unduler_parser_conventional::ConventionalParser;
@@ -121,10 +121,7 @@ fn parse_commits(parser: &dyn CommitParser, raw_commits: &[RawCommit]) -> Vec<Pa
 }
 
 /// Determines the next version based on commits and current version.
-fn determine_next_version(
-    current_version: &Version,
-    parsed_commits: &[ParsedCommit],
-) -> Version {
+fn determine_next_version(current_version: &Version, parsed_commits: &[ParsedCommit]) -> Version {
     let bumper = SemverBumper::new();
     let bump_type = bumper.determine(parsed_commits);
 
