@@ -1,0 +1,22 @@
+[package]
+name = "unduler-formatter-keepachangelog"
+description = "Keep a Changelog formatter plugin for Unduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-commit.workspace = true
+unduler-plugin.workspace = true
+
+chrono.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+semver.workspace = true
+
+[lints]
+workspace = true

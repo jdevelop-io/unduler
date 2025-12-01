@@ -1,0 +1,48 @@
+# Build artifacts
+/target/
+**/*.rs.bk
+
+# Cargo
+Cargo.lock
+!crates/unduler/Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+*.profraw
+*.profdata
+lcov.info
+/coverage/
+
+# Documentation
+/doc/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Test fixtures (generated)
+/tests/fixtures/generated/
+
+# Local configuration
+unduler.local.toml

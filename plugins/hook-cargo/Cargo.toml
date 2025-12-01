@@ -1,0 +1,22 @@
+[package]
+name = "unduler-hook-cargo"
+description = "Cargo/Rust hook plugin for Unduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-plugin.workspace = true
+
+toml.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+semver.workspace = true
+
+[lints]
+workspace = true

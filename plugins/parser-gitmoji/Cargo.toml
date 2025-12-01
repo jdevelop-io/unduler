@@ -1,0 +1,23 @@
+[package]
+name = "unduler-parser-gitmoji"
+description = "Conventional Commits + Gitmoji parser plugin for Unduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-commit.workspace = true
+unduler-plugin.workspace = true
+unduler-parser-conventional.workspace = true
+
+thiserror.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+chrono.workspace = true
+
+[lints]
+workspace = true

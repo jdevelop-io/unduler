@@ -1,0 +1,92 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "crates/unduler",
+    "crates/unduler-core",
+    "crates/unduler-git",
+    "crates/unduler-commit",
+    "crates/unduler-plugin",
+    "crates/unduler-config",
+    "plugins/parser-conventional",
+    "plugins/parser-gitmoji",
+    "plugins/parser-regex",
+    "plugins/bumper-semver",
+    "plugins/formatter-keepachangelog",
+    "plugins/hook-cargo",
+    "plugins/hook-npm",
+    "plugins/hook-github-release",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.90"
+license = "MIT"
+repository = "https://github.com/jdevelop-io/unduler"
+authors = ["Unduler Maintainers <unduler@jdevelop.io>"]
+
+[workspace.dependencies]
+# Internal crates
+unduler-core = { path = "crates/unduler-core" }
+unduler-git = { path = "crates/unduler-git" }
+unduler-commit = { path = "crates/unduler-commit" }
+unduler-plugin = { path = "crates/unduler-plugin" }
+unduler-config = { path = "crates/unduler-config" }
+unduler-parser-conventional = { path = "plugins/parser-conventional" }
+unduler-parser-gitmoji = { path = "plugins/parser-gitmoji" }
+unduler-parser-regex = { path = "plugins/parser-regex" }
+unduler-bumper-semver = { path = "plugins/bumper-semver" }
+unduler-formatter-keepachangelog = { path = "plugins/formatter-keepachangelog" }
+unduler-hook-cargo = { path = "plugins/hook-cargo" }
+unduler-hook-npm = { path = "plugins/hook-npm" }
+unduler-hook-github-release = { path = "plugins/hook-github-release" }
+
+# Git operations
+git2 = "0.20"
+
+# Configuration
+toml = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI
+clap = { version = "4", features = ["derive", "env"] }
+
+# Core
+semver = { version = "1.0", features = ["serde"] }
+thiserror = "2.0"
+anyhow = "1.0"
+regex = "1.11"
+chrono = { version = "0.4", features = ["serde"] }
+
+# Async (if needed later)
+tokio = { version = "1", features = ["full"] }
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Testing
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.14"
+insta = { version = "1.41", features = ["yaml"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+# Lint groups with lower priority so individual lints can override
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+# Allow some pedantic lints (intentional)
+module_name_repetitions = "allow"  # parser::ConventionalParser is fine
+must_use_candidate = "allow"       # too noisy
+struct_excessive_bools = "allow"   # config structs often have multiple flags
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

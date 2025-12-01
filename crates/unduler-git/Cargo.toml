@@ -1,0 +1,24 @@
+[package]
+name = "unduler-git"
+description = "Git abstraction layer for Unduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-commit.workspace = true
+
+git2.workspace = true
+semver.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

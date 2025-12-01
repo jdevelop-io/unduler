@@ -1,0 +1,27 @@
+[package]
+name = "unduler-core"
+description = "Core library for Unduler"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-git.workspace = true
+unduler-commit.workspace = true
+unduler-plugin.workspace = true
+unduler-config.workspace = true
+
+semver.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+chrono.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+insta.workspace = true
+
+[lints]
+workspace = true

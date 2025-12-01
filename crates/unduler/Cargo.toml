@@ -1,0 +1,41 @@
+[package]
+name = "unduler"
+description = "Automate version management and changelog generation for Git-based projects"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "unduler"
+path = "src/main.rs"
+
+[dependencies]
+unduler-core.workspace = true
+unduler-git.workspace = true
+unduler-commit.workspace = true
+unduler-plugin.workspace = true
+unduler-config.workspace = true
+unduler-parser-conventional.workspace = true
+unduler-parser-gitmoji.workspace = true
+unduler-parser-regex.workspace = true
+unduler-bumper-semver.workspace = true
+unduler-formatter-keepachangelog.workspace = true
+unduler-hook-cargo.workspace = true
+unduler-hook-npm.workspace = true
+unduler-hook-github-release.workspace = true
+
+clap.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+assert_cmd.workspace = true
+predicates.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true
