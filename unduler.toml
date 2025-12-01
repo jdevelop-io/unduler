@@ -1,0 +1,19 @@
+[parser]
+name = "conventional-gitmoji"
+
+[parser.conventional-gitmoji]
+infer_type_from_emoji = true
+strict_emoji = false
+
+[bumper]
+name = "semver"
+
+[formatter]
+name = "keepachangelog"
+
+[version]
+tag_prefix = "v"
+files = ["Cargo.toml"]
+
+[changelog]
+output = "CHANGELOG.md"

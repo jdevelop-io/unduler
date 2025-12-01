@@ -111,6 +111,7 @@ impl ChangelogFormatter for KeepAChangelogFormatter {
                     let scope = commit
                         .scope
                         .as_ref()
+                        .filter(|s| !s.is_empty())
                         .map(|s| format!("**{s}:** "))
                         .unwrap_or_default();
 
