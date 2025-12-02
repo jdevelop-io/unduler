@@ -138,6 +138,55 @@ impl Repository {
 
         Ok(())
     }
+
+    /// Stages all modified and new files and creates a commit.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the commit cannot be created.
+    pub fn commit(&self, message: &str) -> GitResult<git2::Oid> {
+        let sig = self.inner.signature()?;
+
+        // Add all changes to index
+        let mut index = self.inner.index()?;
+        index.add_all(["."], git2::IndexAddOption::DEFAULT, None)?;
+        index.write()?;
+
+        let tree_id = index.write_tree()?;
+        let tree = self.inner.find_tree(tree_id)?;
+
+        let parent = self.inner.head().ok().and_then(|h| h.peel_to_commit().ok());
+        let parents: Vec<&git2::Commit<'_>> = parent.iter().collect();
+
+        let oid = self
+            .inner
+            .commit(Some("HEAD"), &sig, &sig, message, &tree, &parents)?;
+
+        Ok(oid)
+    }
+
+    /// Returns the latest commit.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if no commits exist.
+    pub fn latest_commit(&self) -> GitResult<RawCommit> {
+        let head = self.inner.head()?;
+        let commit = head.peel_to_commit()?;
+
+        let author = commit.author();
+        let time = commit.time();
+
+        Ok(RawCommit::new(
+            commit.id().to_string(),
+            commit.message().unwrap_or("").to_string(),
+            author.name().unwrap_or("Unknown"),
+            author.email().unwrap_or(""),
+            Utc.timestamp_opt(time.seconds(), 0)
+                .single()
+                .unwrap_or_else(Utc::now),
+        ))
+    }
 }
 
 #[cfg(test)]
