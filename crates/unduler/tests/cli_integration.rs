@@ -13,24 +13,44 @@ use tempfile::TempDir;
 
 /// Gets the path to the unduler binary.
 fn unduler_bin() -> std::path::PathBuf {
-    // Use the release binary if it exists, otherwise use debug
-    let release_bin = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("target/release/unduler");
+    // Try to find the binary in order of preference:
+    // 1. CARGO_BIN_EXE_unduler (set by cargo test)
+    // 2. target/release/unduler
+    // 3. target/debug/unduler
+    // 4. target/llvm-cov-target/debug/unduler (coverage builds)
 
-    if release_bin.exists() {
-        release_bin
-    } else {
-        Path::new(env!("CARGO_MANIFEST_DIR"))
-            .parent()
-            .unwrap()
-            .parent()
-            .unwrap()
-            .join("target/debug/unduler")
+    if let Ok(bin) = std::env::var("CARGO_BIN_EXE_unduler") {
+        return std::path::PathBuf::from(bin);
     }
+
+    let workspace_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap();
+
+    let candidates = [
+        workspace_root.join("target/release/unduler"),
+        workspace_root.join("target/debug/unduler"),
+        workspace_root.join("target/llvm-cov-target/debug/unduler"),
+    ];
+
+    for candidate in &candidates {
+        if candidate.exists() {
+            return candidate.clone();
+        }
+    }
+
+    // If no binary found, build it in debug mode
+    let status = Command::new("cargo")
+        .args(["build", "-p", "unduler"])
+        .current_dir(workspace_root)
+        .status()
+        .expect("failed to build unduler binary");
+
+    assert!(status.success(), "failed to build unduler");
+
+    workspace_root.join("target/debug/unduler")
 }
 
 /// Creates a temporary git repository with some initial setup.
