@@ -1,0 +1,24 @@
+package unduler:plugin@0.1.0;
+
+/// Release hook plugin interface.
+interface hook {
+    use types.{release-context, hook-result, plugin-info};
+
+    /// Get plugin information.
+    info: func() -> plugin-info;
+
+    /// Called before version files are modified.
+    on-pre-bump: func(ctx: release-context) -> hook-result;
+
+    /// Called after version files are modified.
+    on-post-bump: func(ctx: release-context) -> hook-result;
+
+    /// Called before release commit.
+    on-pre-commit: func(ctx: release-context) -> hook-result;
+
+    /// Called before git tag.
+    on-pre-tag: func(ctx: release-context) -> hook-result;
+
+    /// Called after git tag.
+    on-post-tag: func(ctx: release-context) -> hook-result;
+}

@@ -1,0 +1,25 @@
+[package]
+name = "unduler-wasm-runtime"
+description = "WASM runtime for Unduler plugins"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+unduler-commit.workspace = true
+unduler-plugin.workspace = true
+
+wasmtime.workspace = true
+wasmtime-wasi.workspace = true
+
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

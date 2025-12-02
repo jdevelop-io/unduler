@@ -8,6 +8,9 @@ members = [
     "crates/unduler-commit",
     "crates/unduler-plugin",
     "crates/unduler-config",
+    "crates/unduler-wasm-runtime",
+    "crates/unduler-plugin-manager",
+    "crates/unduler-plugin-sdk",
     "plugins/parser-conventional",
     "plugins/parser-gitmoji",
     "plugins/parser-regex",
@@ -33,6 +36,9 @@ unduler-git = { path = "crates/unduler-git" }
 unduler-commit = { path = "crates/unduler-commit" }
 unduler-plugin = { path = "crates/unduler-plugin" }
 unduler-config = { path = "crates/unduler-config" }
+unduler-wasm-runtime = { path = "crates/unduler-wasm-runtime" }
+unduler-plugin-manager = { path = "crates/unduler-plugin-manager" }
+unduler-plugin-sdk = { path = "crates/unduler-plugin-sdk" }
 unduler-parser-conventional = { path = "plugins/parser-conventional" }
 unduler-parser-gitmoji = { path = "plugins/parser-gitmoji" }
 unduler-parser-regex = { path = "plugins/parser-regex" }
@@ -62,6 +68,10 @@ chrono = { version = "0.4", features = ["serde"] }
 
 # Async (if needed later)
 tokio = { version = "1", features = ["full"] }
+
+# WASM runtime
+wasmtime = { version = "37", features = ["component-model"] }
+wasmtime-wasi = "37"
 
 # Logging
 tracing = "0.1"
