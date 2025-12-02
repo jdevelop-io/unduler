@@ -1,0 +1,21 @@
+package unduler:plugin@0.1.0;
+
+/// World for parser plugins.
+world unduler-parser {
+    export parser;
+}
+
+/// World for bumper plugins.
+world unduler-bumper {
+    export bumper;
+}
+
+/// World for formatter plugins.
+world unduler-formatter {
+    export formatter;
+}
+
+/// World for hook plugins with host capabilities.
+world unduler-hook {
+    export hook;
+}

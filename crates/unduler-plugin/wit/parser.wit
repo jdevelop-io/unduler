@@ -1,0 +1,16 @@
+package unduler:plugin@0.1.0;
+
+/// Commit parser plugin interface.
+interface parser {
+    use types.{raw-commit, parsed-commit, plugin-info};
+
+    /// Get plugin information.
+    info: func() -> plugin-info;
+
+    /// Parse a raw commit into structured data.
+    /// Returns none if the commit doesn't match expected format.
+    parse: func(commit: raw-commit) -> option<parsed-commit>;
+
+    /// Quick check if this parser can handle the commit.
+    can-parse: func(commit: raw-commit) -> bool;
+}

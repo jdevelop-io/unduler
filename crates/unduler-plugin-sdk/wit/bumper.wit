@@ -1,0 +1,12 @@
+package unduler:plugin@0.1.0;
+
+/// Version bump strategy plugin interface.
+interface bumper {
+    use types.{parsed-commit, bump-type, plugin-info};
+
+    /// Get plugin information.
+    info: func() -> plugin-info;
+
+    /// Determine bump type from parsed commits.
+    determine: func(commits: list<parsed-commit>) -> bump-type;
+}

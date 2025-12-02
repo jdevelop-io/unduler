@@ -1,0 +1,17 @@
+[package]
+name = "bumper-semver-wasm"
+version = "0.1.0"
+edition = "2024"
+description = "SemVer bump strategy plugin for Unduler (WASM)"
+
+[workspace]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.41"
+
+[profile.release]
+opt-level = "s"
+lto = true

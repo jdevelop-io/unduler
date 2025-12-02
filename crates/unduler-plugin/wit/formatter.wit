@@ -1,0 +1,15 @@
+package unduler:plugin@0.1.0;
+
+/// Changelog formatter plugin interface.
+interface formatter {
+    use types.{release, formatter-config, plugin-info};
+
+    /// Get plugin information.
+    info: func() -> plugin-info;
+
+    /// Format release into changelog string.
+    format: func(release: release, config: formatter-config) -> string;
+
+    /// Get file extension for output.
+    extension: func() -> string;
+}

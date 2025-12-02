@@ -31,6 +31,9 @@ pub enum Commands {
 
     /// Run a full release (bump + changelog + tag)
     Release(commands::release::ReleaseArgs),
+
+    /// Manage plugins (install, remove, list, search)
+    Plugin(commands::plugin::PluginArgs),
 }
 
 impl Cli {
@@ -41,6 +44,7 @@ impl Cli {
             Commands::Bump(args) => commands::bump::run(args),
             Commands::Changelog(args) => commands::changelog::run(args),
             Commands::Release(args) => commands::release::run(args),
+            Commands::Plugin(args) => commands::plugin::run(args),
         }
     }
 }

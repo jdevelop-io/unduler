@@ -1,0 +1,143 @@
+package unduler:plugin@0.1.0;
+
+/// Shared types for all plugin interfaces.
+interface types {
+    /// Raw commit from Git.
+    record raw-commit {
+        hash: string,
+        message: string,
+        author: string,
+        email: string,
+        timestamp: s64,
+    }
+
+    /// Parsed commit after processing.
+    record parsed-commit {
+        hash: string,
+        commit-type: string,
+        scope: option<string>,
+        message: string,
+        breaking: bool,
+        emoji: option<string>,
+        metadata: list<tuple<string, string>>,
+        author: string,
+        timestamp: s64,
+    }
+
+    /// Version bump type.
+    enum bump-type {
+        major,
+        minor,
+        patch,
+        none,
+    }
+
+    /// Semantic version.
+    record version {
+        major: u32,
+        minor: u32,
+        patch: u32,
+        pre: option<string>,
+        build: option<string>,
+    }
+
+    /// Release information for changelog.
+    record release {
+        version: version,
+        date: string,
+        commits: list<parsed-commit>,
+        previous-version: option<version>,
+        repository-url: option<string>,
+    }
+
+    /// Formatter configuration.
+    record formatter-config {
+        group-by-type: bool,
+        group-by-scope: bool,
+        include-hashes: bool,
+        include-authors: bool,
+        type-labels: list<tuple<string, string>>,
+    }
+
+    /// Release context for hooks.
+    record release-context {
+        repo-path: string,
+        previous-version: version,
+        next-version: version,
+        bump-type: bump-type,
+        commits: list<parsed-commit>,
+        changelog: option<string>,
+        dry-run: bool,
+        metadata: list<tuple<string, string>>,
+    }
+
+    /// Plugin metadata.
+    record plugin-info {
+        name: string,
+        version: string,
+        description: string,
+        plugin-type: plugin-type,
+    }
+
+    /// Plugin type enumeration.
+    enum plugin-type {
+        parser,
+        bumper,
+        formatter,
+        hook,
+    }
+
+    /// Hook execution result.
+    record hook-result {
+        success: bool,
+        error-message: option<string>,
+        metadata-updates: list<tuple<string, string>>,
+        /// Actions to execute after the hook returns.
+        actions: list<hook-action>,
+    }
+
+    /// Action that a hook requests the host to execute.
+    variant hook-action {
+        /// Run a whitelisted command (cargo, npm, yarn, pnpm, gh, git).
+        run-command(command-request),
+        /// Write content to a file.
+        write-file(file-write-request),
+        /// Log a message.
+        log-message(log-request),
+    }
+
+    /// Request to run a command.
+    record command-request {
+        /// Command name (must be whitelisted).
+        command: string,
+        /// Command arguments.
+        args: list<string>,
+        /// Working directory (relative to repo root, or absolute).
+        workdir: option<string>,
+    }
+
+    /// Request to write a file.
+    record file-write-request {
+        /// Path relative to repo root.
+        path: string,
+        /// File content.
+        content: string,
+    }
+
+    /// Request to log a message.
+    record log-request {
+        /// Log level.
+        level: log-level,
+        /// Message to log.
+        message: string,
+    }
+
+    /// Log level for hook messages.
+    enum log-level {
+        trace,
+        debug,
+        info,
+        warn,
+        error,
+    }
+}
