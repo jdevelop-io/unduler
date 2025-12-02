@@ -82,6 +82,10 @@ pub struct InitArgs {
     /// Parser to use
     #[arg(short, long, value_enum, default_value_t = ParserType::Conventional)]
     pub parser: ParserType,
+
+    /// Skip plugin installation suggestions
+    #[arg(long)]
+    pub no_plugins: bool,
 }
 
 /// Generates the configuration file content.
@@ -178,7 +182,62 @@ pub fn run(args: InitArgs) -> Result<()> {
         println!("Edit {CONFIG_FILE_NAME} to add your version files manually.");
     }
 
+    // Suggest plugins based on configuration
+    if !args.no_plugins {
+        suggest_plugins(args.parser, project_type);
+    }
+
     Ok(())
+}
+
+/// Suggests plugins to install based on configuration.
+fn suggest_plugins(parser: ParserType, project_type: ProjectType) {
+    let mut plugins = Vec::new();
+
+    // Parser plugin based on selection
+    let parser_plugin = match parser {
+        ParserType::Conventional => "unduler-parser-conventional",
+        ParserType::ConventionalGitmoji => "unduler-parser-gitmoji",
+        ParserType::Regex => "unduler-parser-regex",
+    };
+    plugins.push(parser_plugin);
+
+    // Always suggest these core plugins
+    plugins.push("unduler-bumper-semver");
+    plugins.push("unduler-formatter-keepachangelog");
+
+    // Hook plugins based on project type
+    match project_type {
+        ProjectType::Rust => {
+            plugins.push("unduler-hook-cargo");
+        }
+        ProjectType::Node => {
+            plugins.push("unduler-hook-npm");
+        }
+        ProjectType::RustAndNode => {
+            plugins.push("unduler-hook-cargo");
+            plugins.push("unduler-hook-npm");
+        }
+        ProjectType::Unknown => {}
+    }
+
+    println!("\nRecommended plugins:");
+    for plugin in &plugins {
+        println!("  - {plugin}");
+    }
+
+    println!("\nInstall all with:");
+    println!(
+        "  unduler plugin install {}",
+        plugins
+            .iter()
+            .map(|p| p.strip_prefix("unduler-").unwrap_or(p))
+            .collect::<Vec<_>>()
+            .join(" ")
+    );
+
+    println!("\nOr install individually:");
+    println!("  unduler plugin install <name>");
 }
 
 #[cfg(test)]

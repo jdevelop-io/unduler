@@ -20,6 +20,9 @@ pub enum PluginCommand {
     /// Remove an installed plugin
     Remove(RemoveArgs),
 
+    /// Update installed plugins
+    Update(UpdateArgs),
+
     /// List installed plugins
     List(ListArgs),
 
@@ -63,6 +66,13 @@ pub struct SearchArgs {
     pub query: String,
 }
 
+/// Arguments for the `plugin update` command.
+#[derive(Debug, Args)]
+pub struct UpdateArgs {
+    /// Plugin name (updates all if not specified)
+    pub name: Option<String>,
+}
+
 /// Arguments for the `plugin info` command.
 #[derive(Debug, Args)]
 pub struct InfoArgs {
@@ -82,6 +92,7 @@ async fn run_async(args: PluginArgs) -> Result<()> {
     match args.command {
         PluginCommand::Install(args) => install(args).await,
         PluginCommand::Remove(ref args) => remove(args),
+        PluginCommand::Update(args) => update(args).await,
         PluginCommand::List(ref args) => list(args),
         PluginCommand::Search(args) => search(args).await,
         PluginCommand::Info(args) => info(args).await,
@@ -122,6 +133,73 @@ fn remove(args: &RemoveArgs) -> Result<()> {
         .with_context(|| format!("failed to remove {crate_name}"))?;
 
     println!("Removed {crate_name}");
+
+    Ok(())
+}
+
+async fn update(args: UpdateArgs) -> Result<()> {
+    let storage = PluginStorage::new().context("failed to initialize plugin storage")?;
+    let mut registry = PluginRegistry::new(storage).context("failed to load plugin registry")?;
+    let discovery = PluginDiscovery::new();
+
+    let plugins_to_update: Vec<_> = if let Some(name) = &args.name {
+        let crate_name = normalize_plugin_name(name);
+        match registry.get(&crate_name) {
+            Some(p) => vec![p.clone()],
+            None => anyhow::bail!("plugin {crate_name} is not installed"),
+        }
+    } else {
+        registry.list().into_iter().cloned().collect()
+    };
+
+    if plugins_to_update.is_empty() {
+        println!("No plugins installed.");
+        return Ok(());
+    }
+
+    let mut updated = 0;
+    let mut up_to_date = 0;
+    let mut errors = 0;
+
+    for plugin in &plugins_to_update {
+        print!("Checking {}... ", plugin.crate_name);
+
+        match discovery.fetch_metadata(&plugin.crate_name).await {
+            Ok(metadata) => {
+                if metadata.latest_version > plugin.version {
+                    println!("updating {} -> {}", plugin.version, metadata.latest_version);
+                    match discovery
+                        .install(&mut registry, &plugin.crate_name, None)
+                        .await
+                    {
+                        Ok(_) => updated += 1,
+                        Err(e) => {
+                            println!("  error: {e}");
+                            errors += 1;
+                        }
+                    }
+                } else {
+                    println!("up to date ({})", plugin.version);
+                    up_to_date += 1;
+                }
+            }
+            Err(e) => {
+                println!("error: {e}");
+                errors += 1;
+            }
+        }
+    }
+
+    println!();
+    if updated > 0 {
+        println!("Updated {updated} plugin(s)");
+    }
+    if up_to_date > 0 {
+        println!("{up_to_date} plugin(s) already up to date");
+    }
+    if errors > 0 {
+        println!("{errors} error(s) occurred");
+    }
 
     Ok(())
 }
