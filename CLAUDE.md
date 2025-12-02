@@ -54,7 +54,7 @@ unduler/
 │   │       ├── raw.rs              # RawCommit (from git)
 │   │       └── parsed.rs           # ParsedCommit (after parsing)
 │   │
-│   ├── unduler-plugin/             # Unified plugin system
+│   ├── unduler-plugin/             # Plugin trait definitions
 │   │   └── src/
 │   │       ├── lib.rs
 │   │       ├── traits/
@@ -63,9 +63,29 @@ unduler/
 │   │       │   ├── bumper.rs       # BumpStrategy trait
 │   │       │   ├── formatter.rs    # ChangelogFormatter trait
 │   │       │   └── hook.rs         # ReleaseHook trait
-│   │       ├── registry.rs         # Plugin registry
-│   │       ├── loader.rs           # Plugin loading
 │   │       └── context.rs          # ReleaseContext shared state
+│   │
+│   ├── unduler-plugin-sdk/         # WASM plugin SDK (WIT bindings)
+│   │   └── wit/                    # WebAssembly Interface Types
+│   │       ├── parser.wit
+│   │       ├── bumper.wit
+│   │       ├── formatter.wit
+│   │       └── hook.wit
+│   │
+│   ├── unduler-wasm-runtime/       # WASM plugin runtime (wasmtime)
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── engine.rs           # WASM engine initialization
+│   │       ├── parser.rs           # Parser plugin loader
+│   │       ├── bumper.rs           # Bumper plugin loader
+│   │       └── hook.rs             # Hook plugin loader & actions
+│   │
+│   ├── unduler-plugin-manager/     # Plugin installation & discovery
+│   │   └── src/
+│   │       ├── lib.rs
+│   │       ├── registry.rs         # Installed plugin registry
+│   │       ├── storage.rs          # Plugin storage (~/.unduler/)
+│   │       └── discovery.rs        # crates.io + GitHub Releases
 │   │
 │   └── unduler-config/             # Configuration management
 │       └── src/
@@ -73,15 +93,20 @@ unduler/
 │           ├── schema.rs           # Config structure
 │           └── loader.rs           # File loading (TOML)
 │
-└── plugins/                        # Built-in plugins
-    ├── parser-conventional/        # Conventional Commits parser
-    ├── parser-conventional-gitmoji/# Conventional + Gitmoji (depends on parser-conventional)
-    ├── parser-regex/               # Custom format via regex
-    ├── bumper-semver/              # SemVer bump strategy
-    ├── formatter-keepachangelog/   # Keep a Changelog format
-    ├── hook-cargo/                 # Rust/Cargo support
-    ├── hook-npm/                   # Node.js/npm support
-    └── hook-github-release/        # GitHub Release creation
+├── plugins/                        # Built-in native plugins (compiled into binary)
+│   ├── parser-conventional/        # Conventional Commits parser
+│   ├── parser-conventional-gitmoji/# Conventional + Gitmoji (depends on parser-conventional)
+│   ├── parser-regex/               # Custom format via regex
+│   ├── bumper-semver/              # SemVer bump strategy
+│   ├── formatter-keepachangelog/   # Keep a Changelog format
+│   ├── hook-cargo/                 # Rust/Cargo support
+│   ├── hook-npm/                   # Node.js/npm support
+│   └── hook-github-release/        # GitHub Release creation
+│
+└── examples/plugins/               # WASM plugin examples (for external plugins)
+    ├── parser-conventional-wasm/   # Example WASM parser
+    ├── bumper-semver-wasm/         # Example WASM bumper
+    └── README.md                   # Plugin creation guide
 ```
 
 ## Parser Plugins
@@ -229,6 +254,27 @@ pub struct ParsedCommit {
 ## Plugin System
 
 Everything is a plugin. The core orchestrates plugins through a configurable pipeline.
+
+### Plugin Architecture
+
+Unduler supports two types of plugins:
+
+1. **Built-in Native Plugins** (Rust crates in `plugins/`)
+   - Compiled directly into the binary
+   - Zero runtime overhead
+   - Always available
+   - Used by default in CLI commands
+   - Examples: `parser-conventional`, `bumper-semver`, `formatter-keepachangelog`
+
+2. **External WASM Plugins** (installed via `unduler plugin install`)
+   - Dynamically loaded at runtime using WebAssembly
+   - Sandboxed execution with WASI capabilities
+   - Installed to `~/.unduler/plugins/`
+   - Distributed via crates.io + GitHub Releases
+   - Examples in `examples/plugins/`
+   - See `examples/plugins/README.md` for creation guide
+
+The CLI uses built-in native plugins by default for performance. Users can extend functionality by installing WASM plugins from crates.io or creating custom plugins.
 
 ### Plugin Traits
 
