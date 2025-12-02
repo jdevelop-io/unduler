@@ -4,11 +4,13 @@
 //! and changelog generation.
 
 mod error;
+mod files;
 mod pipeline;
 mod release;
 mod version;
 
 pub use error::{CoreError, CoreResult};
+pub use files::{FileResult, FileUpdateError, read_version_from_file, update_version_file};
 pub use pipeline::Pipeline;
 pub use release::ReleaseManager;
 pub use version::VersionManager;

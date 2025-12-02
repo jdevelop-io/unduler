@@ -35,7 +35,19 @@ pub fn load_config(path: impl AsRef<Path>) -> ConfigResult<Config> {
 /// Returns an error if no configuration file is found or it cannot be parsed.
 pub fn find_and_load_config() -> ConfigResult<Config> {
     let current_dir = std::env::current_dir()?;
-    let mut dir = current_dir.as_path();
+    find_and_load_config_from(&current_dir)
+}
+
+/// Finds and loads configuration starting from the given directory.
+///
+/// Walks up the directory tree until a configuration file is found.
+///
+/// # Errors
+///
+/// Returns an error if no configuration file is found or it cannot be parsed.
+pub fn find_and_load_config_from(start_dir: impl AsRef<Path>) -> ConfigResult<Config> {
+    let start_dir = start_dir.as_ref();
+    let mut dir = start_dir;
 
     loop {
         let config_path = dir.join(CONFIG_FILE_NAME);
@@ -49,7 +61,7 @@ pub fn find_and_load_config() -> ConfigResult<Config> {
         }
     }
 
-    Err(ConfigError::NotFound(current_dir.join(CONFIG_FILE_NAME)))
+    Err(ConfigError::NotFound(start_dir.join(CONFIG_FILE_NAME)))
 }
 
 #[cfg(test)]
@@ -156,14 +168,7 @@ mod tests {
         )
         .unwrap();
 
-        // Change to the temp directory
-        let original_dir = std::env::current_dir().unwrap();
-        std::env::set_current_dir(temp_dir.path()).unwrap();
-
-        let result = find_and_load_config();
-
-        // Restore original directory
-        std::env::set_current_dir(original_dir).unwrap();
+        let result = find_and_load_config_from(temp_dir.path());
 
         assert!(result.is_ok());
         let config = result.unwrap();
@@ -188,14 +193,7 @@ mod tests {
         let child_dir = parent_dir.path().join("subdir");
         fs::create_dir(&child_dir).unwrap();
 
-        // Change to child directory
-        let original_dir = std::env::current_dir().unwrap();
-        std::env::set_current_dir(&child_dir).unwrap();
-
-        let result = find_and_load_config();
-
-        // Restore original directory
-        std::env::set_current_dir(original_dir).unwrap();
+        let result = find_and_load_config_from(&child_dir);
 
         assert!(result.is_ok());
         let config = result.unwrap();
